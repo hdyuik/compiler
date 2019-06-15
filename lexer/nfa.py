@@ -90,19 +90,6 @@ class NFA:
 
         return NFA(start_state, {accepting_state, }, {start_state, accepting_state})
 
-
-    def repeat(self, lower_bound, upper_bound):
-        pass
-
-    def plus(self):
-        pass
-
-    def question(self):
-        pass
-
-    def clone(self):
-        pass
-
     def display(self):
         all_states = [self.start_state, ]
         index = 0

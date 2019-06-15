@@ -50,8 +50,7 @@ class REParser(BaseParser):
     re              ->          concat  (| concat)*
     concat           ->         limitation_exp+
 
-    limitation_exp   ->         atomic* 或者 atomic+ 或者 atomic? 或者 atomic{times} 或者 atomic
-    times            ->          非负整数   或者  非负整数, 或者  非负整数,非负整数
+    kleene_closure   ->         atomic* 或者 atomic
 
     atomic           ->         bracket 或者 parenthesis 或者 letter
     bracket          ->         [range_exp]
@@ -90,13 +89,13 @@ class REParser(BaseParser):
         raise RESyntaxError()
 
     def parse_concatenation(self):
-        main_nfa = self.parse_limitation_exp()
+        main_nfa = self.parse_kleene_closure()
 
         next_symbol = self.look_ahead()
         if next_symbol in ("|", ")", EOF):
             return main_nfa
         while next_symbol in self.first_of_atomic:
-            rest_nfa = self.parse_limitation_exp()
+            rest_nfa = self.parse_kleene_closure()
             main_nfa = main_nfa.concat(rest_nfa)
             next_symbol = self.look_ahead()
             if next_symbol in ("|", ")", EOF):
@@ -104,45 +103,11 @@ class REParser(BaseParser):
 
         raise RESyntaxError()
 
-    def parse_limitation_exp(self):
+    def parse_kleene_closure(self):
         atomic_exp_nfa = self.parse_atomic()
         if self.look_ahead() == "*":
             self.consume()
             return atomic_exp_nfa.kleene_closure()
-        elif self.look_ahead() == "+":
-            self.consume()
-            return atomic_exp_nfa.plus()
-        elif self.look_ahead() == "?":
-            self.consume()
-            return atomic_exp_nfa.question()
-        elif self.look_ahead() == "{":
-            self.consume()
-            # 分析上下界
-            t2 = None
-            t2_not_exist = False
-            t2_unbound = False
-            t1 = self.parse_times()
-            if self.look_ahead() == ",":
-                self.consume()
-                if self.look_ahead() in "0123456789":
-                    t2 = self.parse_times()
-                else:
-                    t2_unbound = True
-            else:
-                t2_not_exist = True
-            if self.look_ahead() == '}':
-                self.consume()
-            else:
-                raise RESyntaxError()
-            # 构造nfa
-            if t2_not_exist:
-                return atomic_exp_nfa.repeat(t1, t1)
-            elif t2_unbound:
-                return atomic_exp_nfa.repeat(t1, None)
-            else:
-                if t2 < t1:
-                    raise RESyntaxError()
-                return atomic_exp_nfa.repeat(t1, t2)
         elif self.look_ahead() in self.first_of_atomic or self.look_ahead() in ("|", ")", EOF):
             return atomic_exp_nfa
         else:
