@@ -81,6 +81,9 @@ class NFA:
 
         return NFA(start_state, {start_state}, all_states)
 
+    def question(self) -> "NFA":
+        return NFA(self.start_state, self.accepting_states.union({self.start_state}), self.states)
+
     @classmethod
     def alter(cls, symbols: set) -> "NFA":
         start_state = NFAState()

@@ -105,6 +105,9 @@ class REParser(BaseParser):
         if self.look_ahead() == "*":
             self.consume()
             return atomic_exp_nfa.kleene_closure()
+        elif self.look_ahead() == "?":
+            self.consume()
+            return atomic_exp_nfa.question()
         elif self.look_ahead() in self.first_of_atomic or self.look_ahead() in ("|", ")", EOF):
             return atomic_exp_nfa
         else:
