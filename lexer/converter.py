@@ -30,7 +30,7 @@ class Converter:
             for symbol in self.sb.sigma:
                 des_states = set()
                 for src_nfa_state in src_state_s:
-                    des_states.add(src_nfa_state.move(symbol))
+                    des_states.add(src_nfa_state.reach(symbol))
                 if des_states:
                     if des_states in created:
                         old_state.link(symbol, created[des_states])

@@ -48,7 +48,7 @@ class REParser(BaseParser):
     """
     _re               ->         re#
     re              ->          concat  (| concat)*
-    concat           ->         limitation_exp+
+    concat           ->         kleene_closure+
 
     kleene_closure   ->         atomic* 或者 atomic
 
@@ -91,14 +91,11 @@ class REParser(BaseParser):
     def parse_concatenation(self):
         main_nfa = self.parse_kleene_closure()
 
-        next_symbol = self.look_ahead()
-        if next_symbol in ("|", ")", EOF):
-            return main_nfa
-        while next_symbol in self.first_of_atomic:
-            rest_nfa = self.parse_kleene_closure()
-            main_nfa = main_nfa.concat(rest_nfa)
-            next_symbol = self.look_ahead()
-            if next_symbol in ("|", ")", EOF):
+        while self.look_ahead() in self.first_of_atomic or self.look_ahead() in ("|", ")", EOF):
+            if self.look_ahead() in self.first_of_atomic:
+                rest_nfa = self.parse_kleene_closure()
+                main_nfa = main_nfa.concat(rest_nfa)
+            else:
                 return main_nfa
 
         raise RESyntaxError()
@@ -112,18 +109,6 @@ class REParser(BaseParser):
             return atomic_exp_nfa
         else:
             raise RESyntaxError()
-
-    def parse_times(self) -> int:
-        num_string = ""
-        if self.look_ahead() == "0":
-            num_string += self.consume()
-        elif self.look_ahead() in "123456789":
-            num_string += self.consume()
-            while self.look_ahead() in "1234567890":
-                num_string += self.consume()
-        else:
-            raise RESyntaxError()
-        return int(num_string)
 
     def parse_atomic(self):
         next_symbol = self.look_ahead()
@@ -173,7 +158,7 @@ class REParser(BaseParser):
         if reverse:
             letters = self.sb.not_include(letters)
 
-        return self.nfa_class.symbols(letters)
+        return self.nfa_class.alter(letters)
 
     def parse_letters_in_bracket(self) -> str:
         letter = self.parse_letter_in_bracket()
@@ -229,16 +214,16 @@ class REParser(BaseParser):
             self.consume()
             if self.look_ahead() in self.META_SYMBOLS:
                 symbol = self.consume()
-                return self.nfa_class.symbols({symbol})
+                return self.nfa_class.alter({symbol})
             elif self.look_ahead() in self.CONTROL_CHARACTERS:
                 symbol = self.consume()
-                return self.nfa_class.symbols({self.CONTROL_CHARACTERS_MAPPER[symbol]})
+                return self.nfa_class.alter({self.CONTROL_CHARACTERS_MAPPER[symbol]})
             else:
                 raise RESyntaxError()
         elif self.look_ahead() == '.':
             self.consume()
             letters = self.sb.not_include(set('\n\t'))
-            return self.nfa_class.symbols(letters)
+            return self.nfa_class.alter(letters)
         else:
             symbol = self.consume()
-            return self.nfa_class.symbols({symbol})
+            return self.nfa_class.alter({symbol})

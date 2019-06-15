@@ -17,7 +17,7 @@ class NFAState:
             target_state.add(state)
             self.connection[symbol] = target_state
 
-    def move(self, symbol):
+    def reach(self, symbol):
         start = self.closure()
         end = set()
         for state in start:
@@ -82,7 +82,7 @@ class NFA:
         return NFA(start_state, {start_state}, all_states)
 
     @classmethod
-    def symbols(cls, symbols: set) -> "NFA":
+    def alter(cls, symbols: set) -> "NFA":
         start_state = NFAState()
         accepting_state = NFAState()
         for symbol in symbols:
