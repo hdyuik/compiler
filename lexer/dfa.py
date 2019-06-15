@@ -15,6 +15,7 @@ class DFAState:
 
 
 class DFA:
+    StateClass = DFAState
     def __init__(self, start_state, accepting_states, states):
         self.start_state = start_state
         self.accepting_states = accepting_states

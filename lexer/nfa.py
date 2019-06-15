@@ -49,8 +49,9 @@ class NFAState:
 
 
 class NFA:
-    def __init__(self, start_state: NFAState, accepting_states: Set[NFAState], all_states: Set[NFAState]):
-        self.states = all_states
+    StateClass = NFAState
+    def __init__(self, start_state: NFAState, accepting_states: Set[NFAState], states: Set[NFAState]):
+        self.states = states
         self.start_state = start_state
         self.accepting_states = accepting_states
 
@@ -63,7 +64,7 @@ class NFA:
         return NFA(self.start_state, accepting_states, all_states)
 
     def union(self, right_nfa: "NFA") -> "NFA":
-        start_state = NFAState()
+        start_state = NFA.StateClass()
         start_state.link(epsilon, self.start_state)
         start_state.link(epsilon, right_nfa.start_state)
 
@@ -72,7 +73,7 @@ class NFA:
         return NFA(start_state, accepting_states, all_states)
 
     def kleene_closure(self) -> "NFA":
-        start_state = NFAState()
+        start_state = NFA.StateClass()
         start_state.link(epsilon, self.start_state)
         for accepting_state in self.accepting_states:
             accepting_state.link(epsilon, start_state)
@@ -86,8 +87,8 @@ class NFA:
 
     @classmethod
     def one_of(cls, symbols: set) -> "NFA":
-        start_state = NFAState()
-        accepting_state = NFAState()
+        start_state = NFA.StateClass()
+        accepting_state = NFA.StateClass()
         for symbol in symbols:
             start_state.link(symbol, accepting_state)
 

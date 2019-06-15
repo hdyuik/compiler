@@ -3,8 +3,7 @@ from lexer.helper import epsilon
 
 
 class Converter:
-    def __init__(self, dfa_state_class, dfa_class):
-        self.dfa_state_class = dfa_state_class
+    def __init__(self, dfa_class):
         self.dfa_class = dfa_class
 
         self.nfa = None
@@ -25,7 +24,7 @@ class Converter:
         self.pending.append(init_nfa_state_set)
 
     def new_dfa_state(self, nfa_state_set):
-        dfa_state = self.dfa_state_class()
+        dfa_state = self.dfa_class.StateClass()
 
         token_types = set()
         for state in nfa_state_set:

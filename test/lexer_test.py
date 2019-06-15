@@ -1,7 +1,8 @@
+from lexer.nfa import NFA
 from lexer.re_parser import REParser
 
 
-parser = REParser()
+parser = REParser(NFA)
 
 
 def test_json_number():

@@ -1,7 +1,7 @@
 from functools import reduce
 from lexer.re_parser import REParser
 from lexer.converter import Converter
-from lexer.dfa import DFAState, DFA
+from lexer.dfa import DFA
 from lexer.nfa import NFA
 from lexer.token import TokenType, Token
 from lexer.recognizer import Recognizer
@@ -10,7 +10,7 @@ from lexer.recognizer import Recognizer
 class Lexer:
     def __init__(self):
         self.re_parser = REParser(NFA)
-        self.converter= Converter(DFAState, DFA)
+        self.converter= Converter(DFA)
         self.recognizer = Recognizer(Token)
         self.token_types = []
 
