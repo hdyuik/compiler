@@ -5,11 +5,8 @@ from lexer.nfa import NFA
 
 
 class BaseParser:
-    def __init__(self, sigma: set):
+    def __init__(self):
         self.nfa_class = NFA
-        self.sigma = sigma.union({EOF})
-        self.sb = StringBuilder(sigma)
-
         self.regex = None
         self.index = None
         self.re_length = None
@@ -34,7 +31,7 @@ class BaseParser:
         if self.look_ahead() == EOF:
             return nfa
         else:
-            raise RESyntaxError()
+            raise RESyntaxError(self.index, "can not parsing EOF")
 
     def parse(self, regex: str):
         self.regex = list(regex)
@@ -61,6 +58,8 @@ class REParser(BaseParser):
         not_escape       ->         不包含META SYMBOLS
         dot              ->         .
     """
+    SIGMA = set([chr(code) for code in range(256)])
+    STRING_BUILDER = StringBuilder(SIGMA)
     ESCAPES = set("\\")
     META_SYMBOLS = ESCAPES.union(set("[(){*+?|."))
     CONTROL_CHARACTERS = set('nt')
@@ -69,11 +68,9 @@ class REParser(BaseParser):
         't': '\t',
     }
     ESCAPED_SYMBOLS = META_SYMBOLS.union(CONTROL_CHARACTERS)
-
-    def __init__(self, sigma: set):
-        super(REParser, self).__init__(sigma)
-        self.first_of_letter = self.sb.not_include(self.META_SYMBOLS).union("\\").union(".")
-        self.first_of_atomic = set("[(").union(self.first_of_letter)
+    FIRST_OF_LETTER = STRING_BUILDER.not_include(META_SYMBOLS).union({"\\", "."})
+    FIRST_OF_ATOMIC = FIRST_OF_LETTER.union({"[", "("})
+    DOT = STRING_BUILDER.not_include({"\n", "\t"})
 
     def parse_re(self):
         main_nfa = self.parse_concatenation()
@@ -86,19 +83,19 @@ class REParser(BaseParser):
             else:
                 return main_nfa
 
-        raise RESyntaxError()
+        raise RESyntaxError(self.index, "can not parsing union, expect | or EOF or )")
 
     def parse_concatenation(self):
         main_nfa = self.parse_kleene_closure()
 
-        while self.look_ahead() in self.first_of_atomic or self.look_ahead() in ("|", ")", EOF):
-            if self.look_ahead() in self.first_of_atomic:
+        while self.look_ahead() in self.FIRST_OF_ATOMIC or self.look_ahead() in ("|", ")", EOF):
+            if self.look_ahead() in self.FIRST_OF_ATOMIC:
                 rest_nfa = self.parse_kleene_closure()
                 main_nfa = main_nfa.concat(rest_nfa)
             else:
                 return main_nfa
 
-        raise RESyntaxError()
+        raise RESyntaxError(self.index, "can not parsing concatenation, bad input")
 
     def parse_kleene_closure(self):
         atomic_exp_nfa = self.parse_atomic()
@@ -108,10 +105,10 @@ class REParser(BaseParser):
         elif self.look_ahead() == "?":
             self.consume()
             return atomic_exp_nfa.question()
-        elif self.look_ahead() in self.first_of_atomic or self.look_ahead() in ("|", ")", EOF):
+        elif self.look_ahead() in self.FIRST_OF_ATOMIC or self.look_ahead() in ("|", ")", EOF):
             return atomic_exp_nfa
         else:
-            raise RESyntaxError()
+            raise RESyntaxError(self.index, "can not parsing extend form, no * ? or bad input")
 
     def parse_atomic(self):
         next_symbol = self.look_ahead()
@@ -119,47 +116,47 @@ class REParser(BaseParser):
             return self.parse_bracket_exp()
         elif next_symbol == '(':
             return self.parse_parenthesis_exp()
-        elif next_symbol in self.first_of_letter:
+        elif next_symbol in self.FIRST_OF_LETTER:
             return self.parse_letter()
         else:
-            raise RESyntaxError()
+            raise RESyntaxError(self.index, "can not parsing atomic, expect [ or ( or valid letter")
 
     def parse_parenthesis_exp(self):
         if self.look_ahead() == '(':
             self.consume()
         else:
-            raise RESyntaxError()
+            raise RESyntaxError(self.index, "can not parsing start of parenthesis")
 
         nfa = self.parse_re()
 
         if self.look_ahead() == ')':
             self.consume()
         else:
-            raise RESyntaxError()
+            raise RESyntaxError(self.index, "can not parsing end of parenthesis")
         return nfa
 
     def parse_bracket_exp(self):
         if self.look_ahead() == '[':
             self.consume()
         else:
-            raise RESyntaxError()
+            raise RESyntaxError(self.index, "can not parsing start of bracket")
 
-        nfa = self.parse_one_of_exp()
+        nfa = self.parse_alter()
 
         if self.look_ahead() == ']':
             self.consume()
         else:
-            raise RESyntaxError()
+            raise RESyntaxError(self.index, "can not parsing end of bracket")
         return nfa
 
-    def parse_one_of_exp(self):
+    def parse_alter(self):
         reverse = False
         if self.look_ahead() == '^':
             self.consume()
             reverse = True
         letters = set(self.parse_letters_in_bracket())
         if reverse:
-            letters = self.sb.not_include(letters)
+            letters = self.STRING_BUILDER.not_include(letters)
 
         return self.nfa_class.alter(letters)
 
@@ -177,7 +174,7 @@ class REParser(BaseParser):
         while self.look_ahead() != ']':
             lower_bound = self.parse_letter_in_bracket()
             if self.consume() != '-':
-                raise RESyntaxError()
+                raise RESyntaxError(self.index, "can not parsing - in bracket")
             upper_bound = self.parse_letter_in_bracket()
             ranges.append((lower_bound, upper_bound))
 
@@ -186,14 +183,14 @@ class REParser(BaseParser):
             lb = ord(pair[0])
             ub = ord(pair[1])
             if lb > ub:
-                raise RESyntaxError()
+                raise RESyntaxError(self.index, "lower bound > upper bound in bracket ")
             else:
                 for i in range(lb, ub+1):
                     letters.add(chr(i))
         return ''.join(letters)
 
     def parse_letter_set(self, first_letter) -> str:
-        letters = set(first_letter)
+        letters = {first_letter}
         while self.look_ahead() != ']':
             letters.add(self.parse_letter_in_bracket())
         return ''.join(letters)
@@ -204,15 +201,15 @@ class REParser(BaseParser):
             if self.look_ahead() == '\\' or self.look_ahead() == ']':
                 return self.consume()
             else:
-                raise RESyntaxError()
+                raise RESyntaxError(self.index, "error escape letter in bracket")
         elif self.look_ahead() != ']':
             return self.consume()
         else:
-            raise RESyntaxError()
+            raise RESyntaxError(self.index, "error letter in bracket")
 
     def parse_letter(self):
-        if self.look_ahead() not in self.first_of_letter:
-            raise RESyntaxError()
+        if self.look_ahead() not in self.FIRST_OF_LETTER:
+            raise RESyntaxError(self.index, "can not parsing letter")
         elif self.look_ahead() in self.ESCAPES:
             self.consume()
             if self.look_ahead() in self.META_SYMBOLS:
@@ -222,11 +219,10 @@ class REParser(BaseParser):
                 symbol = self.consume()
                 return self.nfa_class.alter({self.CONTROL_CHARACTERS_MAPPER[symbol]})
             else:
-                raise RESyntaxError()
+                raise RESyntaxError(self.index, "can not parsing escape letter")
         elif self.look_ahead() == '.':
             self.consume()
-            letters = self.sb.not_include(set('\n\t'))
-            return self.nfa_class.alter(letters)
+            return self.nfa_class.alter(self.DOT)
         else:
             symbol = self.consume()
             return self.nfa_class.alter({symbol})
