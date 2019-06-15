@@ -5,8 +5,8 @@ from lexer.nfa import NFA
 
 
 class BaseParser:
-    def __init__(self):
-        self.nfa_class = NFA
+    def __init__(self, nfa_class):
+        self.nfa_class = nfa_class
         self.regex = None
         self.index = None
         self.re_length = None
@@ -33,7 +33,7 @@ class BaseParser:
         else:
             raise RESyntaxError(self.index, "can not parsing EOF")
 
-    def parse(self, regex: str):
+    def parse(self, regex: str) -> "NFA":
         self.regex = list(regex)
         self.re_length = len(regex)
         self.index = 0
@@ -158,7 +158,7 @@ class REParser(BaseParser):
         if reverse:
             letters = self.STRING_BUILDER.not_include(letters)
 
-        return self.nfa_class.alter(letters)
+        return self.nfa_class.one_of(letters)
 
     def parse_letters_in_bracket(self) -> str:
         letter = self.parse_letter_in_bracket()
@@ -214,15 +214,15 @@ class REParser(BaseParser):
             self.consume()
             if self.look_ahead() in self.META_SYMBOLS:
                 symbol = self.consume()
-                return self.nfa_class.alter({symbol})
+                return self.nfa_class.one_of({symbol})
             elif self.look_ahead() in self.CONTROL_CHARACTERS:
                 symbol = self.consume()
-                return self.nfa_class.alter({self.CONTROL_CHARACTERS_MAPPER[symbol]})
+                return self.nfa_class.one_of({self.CONTROL_CHARACTERS_MAPPER[symbol]})
             else:
                 raise RESyntaxError(self.index, "can not parsing escape letter")
         elif self.look_ahead() == '.':
             self.consume()
-            return self.nfa_class.alter(self.DOT)
+            return self.nfa_class.one_of(self.DOT)
         else:
             symbol = self.consume()
-            return self.nfa_class.alter({symbol})
+            return self.nfa_class.one_of({symbol})

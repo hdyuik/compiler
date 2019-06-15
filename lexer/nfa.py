@@ -28,7 +28,7 @@ class NFAState:
             end.update(state.closure())
         return end
 
-    def closure(self):
+    def closure(self) -> Set["NFAState"]:
         result_states = set()
         result_states.add(self)
         if epsilon in self.connection:
@@ -85,7 +85,7 @@ class NFA:
         return NFA(self.start_state, self.accepting_states.union({self.start_state}), self.states)
 
     @classmethod
-    def alter(cls, symbols: set) -> "NFA":
+    def one_of(cls, symbols: set) -> "NFA":
         start_state = NFAState()
         accepting_state = NFAState()
         for symbol in symbols:

@@ -1,55 +1,81 @@
-from functools import reduce
 from collections import deque
-from lexer.helper import StringBuilder
+from lexer.helper import epsilon
 
 
 class Converter:
-    def __init__(self, dfa_state_class, sigma):
-        self.sb = StringBuilder(sigma)
+    def __init__(self, dfa_state_class, dfa_class):
         self.dfa_state_class = dfa_state_class
+        self.dfa_class = dfa_class
 
-    def convert(self, nfas_tokens):
-        accepting_state_record = {}
-        for nfa, token_id in nfas_tokens:
-            for accepting_state in nfa.accepting_states:
-                accepting_state_record[accepting_state] = token_id
+        self.nfa = None
+        self.nfa_accepting_mapper = None
+        self.dfa_start_state = None
+        self.dfa_accepting_mapper = {}
+        self.created = {}
+        self.pending = deque()
 
-        pending = deque()
-        created = {}
-        whole_nfa = reduce(lambda nfa1, nfa2: nfa.union(nfa2), [nfa for nfa, token in nfas_tokens])
-        init_nfa_state_s = whole_nfa.start_state.closure()
-        init_dfa_state = self.make_dfa_state(init_nfa_state_s, accepting_state_record)
+    def pre_configure(self, nfa, nfa_accepting_mapper):
+        self.nfa = nfa
+        self.nfa_accepting_mapper = nfa_accepting_mapper
+        init_nfa_state_set = self.nfa.start_state.closure()
+        dfa_start_state = self.new_dfa_state(init_nfa_state_set)
 
-        pending.append(init_nfa_state_s)
-        created[init_nfa_state_s] = init_dfa_state
+        self.created[init_nfa_state_set] = dfa_start_state
+        self.dfa_start_state = dfa_start_state
+        self.pending.append(init_nfa_state_set)
 
-        while pending:
-            current = pending.popleft()
-            src_state_s = current[0]
-            old_state = created[src_state_s]
-            for symbol in self.sb.sigma:
-                des_states = set()
-                for src_nfa_state in src_state_s:
-                    des_states.add(src_nfa_state.reach(symbol))
-                if des_states:
-                    if des_states in created:
-                        old_state.link(symbol, created[des_states])
-                    else:
-                        new_state = self.make_dfa_state(des_states, accepting_state_record)
-                        old_state.link(symbol, new_state)
-                        created[des_states] = new_state
-                        pending.append(des_states)
-        return init_dfa_state
-
-    def make_dfa_state(self, nfa_states, accepting_state_record):
+    def new_dfa_state(self, nfa_state_set):
         dfa_state = self.dfa_state_class()
 
-        token_ids = set()
-        for state in nfa_states:
-            if state in accepting_state_record:
-                token_ids.add(accepting_state_record[state])
+        token_types = set()
+        for state in nfa_state_set:
+            if state.index in self.nfa_accepting_mapper:
+                token_types.add(self.nfa_accepting_mapper[state.index])
 
-        if token_ids:
-            dfa_state.set_token_id(min(token_ids))
+        if token_types:
+            self.dfa_accepting_mapper[dfa_state.index] = token_types
 
         return dfa_state
+
+    def _convert(self):
+        while self.pending:
+            current = self.pending.popleft()
+            src_state_set = current
+            old_dfa_state = self.created[src_state_set]
+
+            symbols = set()
+            for state in src_state_set:
+                symbols.add(*state.connection.keys())
+            symbols.remove(epsilon)
+
+            if symbols:
+                for symbol in symbols:
+                    des_nfa_states = set()
+                    for state in src_state_set:
+                        des_nfa_states.add(state.reach(symbol))
+                    if des_nfa_states in self.created:
+                        old_dfa_state.link(symbol, self.created[des_nfa_states])
+                    else:
+                        new_dfa_state = self.new_dfa_state(des_nfa_states)
+                        old_dfa_state.link(symbol, new_dfa_state)
+                        self.created[des_nfa_states] = new_dfa_state
+                        self.pending.append(des_nfa_states)
+
+    def reset(self):
+        pass
+
+    def convert(self, nfa, nfa_accepting_mapper):
+        self.pre_configure(nfa, nfa_accepting_mapper)
+        self._convert()
+        dfa_construction_data = {
+            "start_state": self.dfa_start_state,
+            "accepting_states": set(self.dfa_accepting_mapper.keys()),
+            "states": set(self.created.values()),
+        }
+        dfa = self.dfa_class(**dfa_construction_data)
+        dfa_accepting_mapper = self.dfa_accepting_mapper
+        self.reset()
+        return {
+            "dfa": dfa,
+            "accepting_mapper": dfa_accepting_mapper,
+        }
