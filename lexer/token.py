@@ -6,9 +6,12 @@ class Token:
 
 class TokenType:
     count = 0
-    def __init__(self, regex, name, annotation=""):
+    def __init__(self, name, regex, annotation=""):
         TokenType.count += 1
         self.index = TokenType.count
-        self.regex = regex
         self.name = name
+        self.regex = regex
         self.annotation = annotation
+
+    def __repr__(self):
+        return "Token: {0}".format(self.name)

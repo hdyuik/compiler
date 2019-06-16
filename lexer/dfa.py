@@ -13,6 +13,18 @@ class DFAState:
         assert symbol not in self.connection and symbol is not epsilon
         self.connection[symbol] = state
 
+    def display(self):
+        print("===== STATE {0} =====".format(self.index))
+        state_count = 0
+        for symbol in self.connection.keys():
+            state = self.connection[symbol]
+            print("    link to state {0} with {1}".format(state.index, symbol))
+            state_count += 1
+        print("TOTAL CONNECTED COUNT: {0}".format(state_count))
+
+    def __repr__(self):
+        return "DFAState with id {0}".format(self.index)
+
 
 class DFA:
     StateClass = DFAState
@@ -29,5 +41,21 @@ class DFA:
     def compact_symbol_sets(self):
         sigma = set()
         for state in self.states:
-            sigma.union(state.connection.keys())
-        return sigma
+            sigma.update(state.connection.keys())
+        return [{symbol, } for symbol in sigma]
+
+    def display(self):
+        all_states = [self.start_state, ]
+        index = 0
+        while index != len(all_states):
+            current_state = all_states[index]
+            if current_state is self.start_state:
+                print("start state")
+            elif current_state in self.accepting_states:
+                print("accepting state")
+            current_state.display()
+            print("\n")
+            for next_state in current_state.connection.values():
+                if next_state not in all_states:
+                    all_states.append(next_state)
+            index += 1

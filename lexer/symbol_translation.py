@@ -10,8 +10,9 @@ class SymbolTranslation(MutableMapping):
     def concat(self, translation: "SymbolTranslation"):
         new_translation = SymbolTranslation()
         for key, value in self.items():
-            true_value = translation[value]
-            new_translation[key] = true_value
+            if value in translation:
+                true_value = translation[value]
+                new_translation[key] = true_value
         return new_translation
 
     def clear(self):
@@ -34,3 +35,6 @@ class SymbolTranslation(MutableMapping):
 
     def __iter__(self):
         return self.translation_table.__iter__()
+
+    def __str__(self):
+        return self.translation_table.__str__()

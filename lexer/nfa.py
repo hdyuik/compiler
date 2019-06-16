@@ -24,7 +24,7 @@ class NFAState:
             if symbol in state.connection:
                 end.update(state.connection[symbol])
 
-        for state in end:
+        for state in end.copy():
             end.update(state.closure())
         return end
 
@@ -136,7 +136,6 @@ class NFA:
     @staticmethod
     def calculate_compression(left_compressible: List[Set[Any]], left_incompressible: Set[Any],
                               right_compressible: List[Set[Any]], right_incompressible: Set[Any]):
-        print("cal")
         left_cb = [compressible_set.difference(right_incompressible) for compressible_set in left_compressible]
         right_cb = [compressible_set.difference(left_incompressible) for compressible_set in right_compressible]
         icb = left_incompressible.union(right_incompressible)

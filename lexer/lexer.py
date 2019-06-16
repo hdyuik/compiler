@@ -15,8 +15,8 @@ class Lexer:
         self.recognizer = Recognizer(Token)
         self.token_types = []
 
-    def set_token(self, regex, name, annotation=""):
-        self.token_types.append(TokenType(regex, name, annotation))
+    def set_token(self, name, regex, annotation=""):
+        self.token_types.append(TokenType(name, regex, annotation))
 
     def lex(self, input_string):
         nfa_accepting_mapper = {}
@@ -24,7 +24,7 @@ class Lexer:
         for token_type in self.token_types:
             nfa = self.re_parser.parse(token_type.regex)
             for state in nfa.accepting_states:
-                nfa_accepting_mapper[state.index] = token_type
+                nfa_accepting_mapper[state] = token_type
             nfas.append(nfa)
         complete_nfa = reduce(lambda nfa1, nfa2: nfa1.union(nfa2), nfas)
 
