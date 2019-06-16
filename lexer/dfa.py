@@ -1,5 +1,5 @@
-from lexer.helper import epsilon, EOF
-from lexer.exceptions import RecognizeError
+from typing import Set
+from lexer.helper import epsilon
 
 
 class DFAState:
@@ -16,7 +16,18 @@ class DFAState:
 
 class DFA:
     StateClass = DFAState
-    def __init__(self, start_state, accepting_states, states):
+    def __init__(self, start_state: DFAState, accepting_states:Set[DFAState], states: Set[DFAState]):
         self.start_state = start_state
         self.accepting_states = accepting_states
         self.states = states
+        self.minimize()
+
+    def minimize(self):
+        pass
+
+    @property
+    def compact_symbol_sets(self):
+        sigma = set()
+        for state in self.states:
+            sigma.union(state.connection.keys())
+        return sigma

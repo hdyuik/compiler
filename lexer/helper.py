@@ -1,8 +1,8 @@
 class Epsilon:
     def __str__(self):
         return "ε"
-
 epsilon = Epsilon()
+EOF = "@@@"
 
 
 class StringBuilder:
@@ -15,6 +15,3 @@ class StringBuilder:
             if c not in removal_cs:
                 s.add(c)
         return s
-
-
-EOF = "@@@"

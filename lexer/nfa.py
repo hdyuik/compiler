@@ -1,4 +1,4 @@
-from typing import Set, Dict, Any
+from typing import Set, Dict, Any, List
 from lexer.helper import epsilon
 
 
@@ -50,40 +50,72 @@ class NFAState:
 
 class NFA:
     StateClass = NFAState
-    def __init__(self, start_state: NFAState, accepting_states: Set[NFAState], states: Set[NFAState]):
+    def __init__(self, start_state: NFAState, accepting_states: Set[NFAState], states: Set[NFAState], cb: List[Set[Any]], icb: Set[Any]):
         self.states = states
         self.start_state = start_state
         self.accepting_states = accepting_states
 
+        self.cb = cb
+        self.icb = icb
+
     def concat(self, right_nfa: "NFA") -> "NFA":
         for accepting_state in self.accepting_states:
             accepting_state.link(epsilon, right_nfa.start_state)
-
         accepting_states = right_nfa.accepting_states
-        all_states = set(self.states).union(right_nfa.states)
-        return NFA(self.start_state, accepting_states, all_states)
+        states = set(self.states).union(right_nfa.states)
+        cb, icb = self.calculate_compression(self.cb, self.icb, right_nfa.cb, right_nfa.icb)
+
+        nfa_data = {
+            "start_state": self.start_state,
+            "accepting_states": accepting_states,
+            "states": states,
+            "cb": cb,
+            "icb": icb,
+        }
+        return NFA(**nfa_data)
 
     def union(self, right_nfa: "NFA") -> "NFA":
         start_state = NFA.StateClass()
         start_state.link(epsilon, self.start_state)
         start_state.link(epsilon, right_nfa.start_state)
-
         accepting_states = self.accepting_states.union(right_nfa.accepting_states)
-        all_states = self.states.union(right_nfa.states).union([start_state, ])
-        return NFA(start_state, accepting_states, all_states)
+        states = self.states.union(right_nfa.states).union([start_state, ])
+        cb, icb = self.calculate_compression(self.cb, self.icb, right_nfa.cb, right_nfa.icb)
+
+        nfa_data = {
+            "start_state": start_state,
+            "accepting_states": accepting_states,
+            "states": states,
+            "cb": cb,
+            "icb": icb,
+        }
+        return NFA(**nfa_data)
 
     def kleene_closure(self) -> "NFA":
         start_state = NFA.StateClass()
         start_state.link(epsilon, self.start_state)
         for accepting_state in self.accepting_states:
             accepting_state.link(epsilon, start_state)
+        states = self.states.union({start_state, })
 
-        all_states = self.states.union({start_state, })
-
-        return NFA(start_state, {start_state}, all_states)
+        nfa_data = {
+            "start_state": start_state,
+            "accepting_states": {start_state, },
+            "states": states,
+            "cb": self.cb,
+            "icb": self.icb,
+        }
+        return NFA(**nfa_data)
 
     def question(self) -> "NFA":
-        return NFA(self.start_state, self.accepting_states.union({self.start_state}), self.states)
+        nfa_data = {
+            "start_state": self.start_state,
+            "accepting_states": self.accepting_states.union({self.start_state}),
+            "states": self.states,
+            "cb": self.cb,
+            "icb": self.icb,
+        }
+        return NFA(**nfa_data)
 
     @classmethod
     def one_of(cls, symbols: set) -> "NFA":
@@ -92,7 +124,45 @@ class NFA:
         for symbol in symbols:
             start_state.link(symbol, accepting_state)
 
-        return NFA(start_state, {accepting_state, }, {start_state, accepting_state})
+        nfa_data = {
+            "start_state": start_state,
+            "accepting_states": {accepting_state, },
+            "states": {start_state, accepting_state},
+            "cb": [symbols, ],
+            "icb": set(),
+        }
+        return NFA(**nfa_data)
+
+    @staticmethod
+    def calculate_compression(left_compressible: List[Set[Any]], left_incompressible: Set[Any],
+                              right_compressible: List[Set[Any]], right_incompressible: Set[Any]):
+        print("cal")
+        left_cb = [compressible_set.difference(right_incompressible) for compressible_set in left_compressible]
+        right_cb = [compressible_set.difference(left_incompressible) for compressible_set in right_compressible]
+        icb = left_incompressible.union(right_incompressible)
+        cb = []
+
+        for left_set in left_cb:
+            for right_set in right_cb:
+                intersection = left_set.intersection(right_set)
+                cb.append(intersection)
+                left_set.difference_update(intersection)
+                right_set.difference_update(intersection)
+        cb.extend(left_cb)
+        cb.extend(right_cb)
+
+        discard = [cb_set for cb_set in cb if len(cb_set) in (0, 1)]
+        for obj in discard:
+            cb.remove(obj)
+            icb.update(obj)
+
+        return cb, icb
+
+    @property
+    def compact_symbol_sets(self):
+        compression = [{char, } for char in self.icb]
+        compression.extend(self.cb)
+        return compression
 
     def display(self):
         all_states = [self.start_state, ]
