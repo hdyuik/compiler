@@ -99,7 +99,7 @@ class Converter:
         self.nfa_symbol_translation = None
 
         self.dfa_start_state = None
-        self.dfa_accepting_mapper.clear()
+        self.dfa_accepting_mapper = {}
         self.created.clear()
         self.pending.clear()
 
@@ -112,7 +112,8 @@ class Converter:
             "states": set(self.created.values()),
         }
         dfa = self.dfa_class(**dfa_construction_data)
-        dfa_accepting_mapper = {k: v for k, v in self.dfa_accepting_mapper.items()}
+        dfa_accepting_mapper = self.dfa_accepting_mapper
+        self.reset()
         return {
             "dfa": dfa,
             "accepting_mapper": dfa_accepting_mapper,
