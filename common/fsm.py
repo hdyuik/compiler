@@ -5,12 +5,17 @@ from functools import reduce
 from common.symbol import epsilon
 
 
-class ItemCollection(dict):
+class NFAItems:
     def __str__(self):
         res = ""
-        for k, v in self.items():
-            res += "{0}: {1}\n".format(k, str(v))
+        for item in self.__dict__.values():
+            res += "{0}\n".format(str(item))
         return res
+
+
+class DFAItems(NFAItems):
+    def __init__(self):
+        self.nfa_states = set()                                  # type: Set[NFAState]
 
 
 class Edge:
@@ -22,10 +27,11 @@ class Edge:
 
 class NFAState:
     count = 0
+    ItemStorageClass = NFAItems
     def __init__(self):
         self.__class__.count += 1
         self.index = self.__class__.count
-        self.items = ItemCollection()
+        self.items = self.__class__.ItemStorageClass()             # type: NFAState.ItemStorageClass
         self.edges = []                                            # type: List[Edge]
         self._connection = defaultdict(set)                       # type: Dict[Any, Set[NFAState]]
 
@@ -80,6 +86,7 @@ class NFA:
 
 class DFAState(NFAState):
     count = 0
+    ItemStorageClass = DFAItems
     def link(self, symbol, state):
         assert symbol is not epsilon and symbol not in self._connection
         super(DFAState, self).link(symbol, state)

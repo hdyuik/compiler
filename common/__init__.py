@@ -5,6 +5,8 @@ from .fsm import (
     NFA,
     DFAState,
     DFA,
+    NFAItems,
+    DFAItems,
 )
 
 from .symbol import NonTerminal, Terminal, epsilon, EOF

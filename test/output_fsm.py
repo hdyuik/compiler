@@ -1,18 +1,19 @@
+from random import sample
 from collections import defaultdict
-from graphviz import Digraph
+from graphviz import Digraph, Graph
 
-def output_fsm(fsm, filename):
-    graph = Digraph()
+def output_fsm(fsm, filename, symbol_mapper=None):
+    fsm_graph = Digraph()
     for state in fsm.states:
         name = str(state.index)
         label = str(state.items)
 
         if state is fsm.start_state:
-            graph.node(name, label, shape="box")
+            fsm_graph.node(name, label, shape="box")
         elif state in fsm.accepting_states:
-            graph.node(name, label, shape="doublecircle")
+            fsm_graph.node(name, label, shape="doublecircle")
         else:
-            graph.node(name, label)
+            fsm_graph.node(name, label)
 
 
     folded_edges = defaultdict(set)
@@ -23,5 +24,26 @@ def output_fsm(fsm, filename):
         folded_edges[(src, dest)].add(symbol)
 
     for conn, symbol in folded_edges.items():
-        graph.edge(conn[0], conn[1], ",".join(symbol))
-    graph.render(filename, cleanup=True)
+        fsm_graph.edge(conn[0], conn[1], ",".join(symbol))
+
+    fsm_graph.render(filename, cleanup=True)
+
+    if symbol_mapper:
+        mapper_graph = Graph(node_attr={"shape": "record"})
+
+        for index, symbols in symbol_mapper.items():
+            if len(symbols) > 10:
+                text = ','.join(sample(symbols, 10))
+            else:
+                text = ','.join(symbols)
+
+            text = text.replace("|", "\|")
+            text = text.replace(">", "\>")
+            text = text.replace("<", "\<")
+            text = text.replace("{", "\{")
+            text = text.replace("}", "\}")
+            text = text.replace("\\", "\\\\")
+
+            mapper_graph.node(str(index), "{0}|{1}".format(text, str(index)))
+
+        mapper_graph.render(filename+"_mapper", cleanup=True)

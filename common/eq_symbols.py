@@ -10,7 +10,8 @@ class EqualSymbols:
     def __init__(self, nfa: NFA):
         self.nfa = nfa
         self.sigma = None
-        self._symbol_translation = None
+        self.mapper = None
+        self.reversed_mapper = None
         self.calculate()
 
     def calculate(self):
@@ -28,18 +29,22 @@ class EqualSymbols:
         for symbol, uvs in m.items():
             reversed_m[uvs].add(symbol)
 
+        reversed_translation = defaultdict(set)
         symbol_translation = {}                                                         # type: Dict[Any, int]
         sigma = set()
         i = 1
         for symbols in reversed_m.values():
+            reversed_translation[i].update(symbols)
             for symbol in symbols:
                 symbol_translation[symbol] = i
+
             i += 1
             sigma.add(*sample(symbols, 1))
 
-        self._symbol_translation = symbol_translation
+        self.reversed_mapper = reversed_translation
+        self.mapper = symbol_translation
         self.sigma = sigma
 
     def index(self, symbol):
-        return self._symbol_translation[symbol]
+        return self.mapper[symbol]
 

@@ -15,10 +15,11 @@ def test_json_number():
     token = TokenType("json number", "-?(0|[1-9][0-9]*)(\\.[0-9][0-9]*)?([eE][-+]?[0-9][0-9]*)?")
 
     nfa = parser.parse(token.regex)
-    output_fsm(nfa, "json_number_nfa")
 
     eq_symbols = EqualSymbols(nfa)
-    dfa = converter.convert(nfa, eq_symbols, LexerDFA, "NFAStates")
+    dfa = converter.convert(nfa, eq_symbols, LexerDFA)
+    output_fsm(dfa,"json_number_dfa", eq_symbols.reversed_mapper)
+
 
 
 def test_json_string():
@@ -28,12 +29,12 @@ def test_json_string():
 
     nfa = parser.parse(token.regex)
     eq_symbols = EqualSymbols(nfa)
-    dfa = converter.convert(nfa, eq_symbols, LexerDFA, "NFAStates")
+    dfa = converter.convert(nfa, eq_symbols, LexerDFA)
 
-    output_fsm(dfa, "json_string_nfa")
+    output_fsm(dfa, "json_string_dfa", eq_symbols.reversed_mapper)
 
 def test():
-    test_json_number()
-    # test_json_string()
+    # test_json_number()
+    test_json_string()
 
 test()

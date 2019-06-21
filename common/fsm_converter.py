@@ -14,20 +14,20 @@ class Converter:
         self.dfa_accepting_states = None
         self.created = None
         self.pending = None
-        self.item_key = None
+        self.item_attr_name = None
 
     @staticmethod
     def sorted_state_indexes(state_set):
         return tuple(state.index for state in sorted(state_set, key=lambda state: state.index))
 
-    def pre_configure(self, nfa, eq_symbols, dfa_class, item_key):
+    def pre_configure(self, nfa, eq_symbols, dfa_class, item_attr_name):
         self.nfa = nfa
         self.dfa_class = dfa_class
         self.eq_symbol_set = eq_symbols
         self.dfa_accepting_states = set()
         self.created = {}
         self.pending = deque()
-        self.item_key = item_key
+        self.item_attr_name = item_attr_name
 
         init_nfa_state_set = self.nfa.start_state.epsilon_closure()
         state_indexes = self.sorted_state_indexes(init_nfa_state_set)
@@ -39,7 +39,7 @@ class Converter:
 
     def new_dfa_state(self, nfa_state_set):
         dfa_state = self.dfa_class.StateClass()
-        dfa_state.items[self.item_key] = ConvertItem(nfa_state_set)
+        setattr(dfa_state.items, self.item_attr_name, ConvertItem(nfa_state_set))
         return dfa_state
 
     def _convert(self):
@@ -47,7 +47,7 @@ class Converter:
             src_dfa_state = self.pending.popleft()
             for symbol in self.eq_symbol_set.sigma:
                 des_nfa_states = set()
-                for src_nfa_state in src_dfa_state.items[self.item_key]:
+                for src_nfa_state in getattr(src_dfa_state.items, self.item_attr_name):
                     des_nfa_states.update(src_nfa_state.reach(symbol))
                 if des_nfa_states:
                     link_data = self.eq_symbol_set.index(symbol)
@@ -73,10 +73,10 @@ class Converter:
         self.dfa_accepting_states = None
         self.created = None
         self.pending = None
-        self.item_key = None
+        self.item_attr_name = None
 
-    def convert(self, nfa, eq_symbols, dfa_class, item_key):
-        self.pre_configure(nfa, eq_symbols, dfa_class, item_key)
+    def convert(self, nfa, eq_symbols, dfa_class, item_attr_name="nfa_states"):
+        self.pre_configure(nfa, eq_symbols, dfa_class, item_attr_name)
         self._convert()
         dfa_construction_data = {
             "start_state": self.dfa_start_state,

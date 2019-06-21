@@ -31,6 +31,6 @@ class Lexer:
             nfa=complete_nfa,
             eq_symbols=nfa_eq_symbols,
             dfa_class=LexerDFA,
-            item_key="NFAStates",
+            item_attr_name="NFAStates",
         )
         dfa_eq_symbols = EqualSymbols(dfa)

@@ -12,17 +12,22 @@ NT1 = NonTerminal("NT1")
 NT2 = NonTerminal("NT2")
 grammar = Grammar("test")
 grammar.add_rule(NT1, [NT1, NT2, t3])
-grammar.add_rule(NT1, [epsilon, ])
+grammar.add_rule(NT1, [t2, ])
+grammar.add_rule(NT2, [t1, ])
+
 grammar.set_start_symbol(NT1)
 
 
 nfa = nfa_generator(grammar)
-output_fsm(nfa, "LALRNFA")
 
 channeling = Channelling()
 channeling.channelling(nfa, grammar)
-nfa_eq_symbols = EqualSymbols(nfa)
-converter = Converter()
-dfa = converter.convert(nfa, nfa_eq_symbols, DFA, "nfa_states")
 
-output_fsm(dfa, "LALRDFA")
+
+output_fsm(nfa, "LALRNFA")
+
+nfa_eq_symbols = EqualSymbols(nfa)
+# converter = Converter()
+# dfa = converter.convert(nfa, nfa_eq_symbols, DFA, "nfa_states")
+
+# output_fsm(dfa, "LALRDFA")
