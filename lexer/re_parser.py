@@ -1,7 +1,20 @@
 from abc import abstractmethod
-from lexer.helper import StringBuilder, EOF
+
+from common.symbol import EOF
 from lexer.exceptions import RESyntaxError
-from lexer.nfa import NFA
+from lexer.nfa import LexerNFA
+
+
+class StringBuilder:
+    def __init__(self, sigma: set):
+        self.sigma = sigma
+
+    def not_include(self, removal_cs: set):
+        s = set()
+        for c in self.sigma:
+            if c not in removal_cs:
+                s.add(c)
+        return s
 
 
 class BaseParser:
@@ -33,7 +46,7 @@ class BaseParser:
         else:
             raise RESyntaxError(self.index, "can not parsing EOF")
 
-    def parse(self, regex: str) -> "NFA":
+    def parse(self, regex: str) -> "LexerNFA":
         self.regex = list(regex)
         self.re_length = len(regex)
         self.index = 0

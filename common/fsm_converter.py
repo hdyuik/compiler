@@ -44,21 +44,20 @@ class Converter:
 
     def _convert(self):
         while self.pending:
-            old_dfa_state = self.pending.popleft()
+            src_dfa_state = self.pending.popleft()
             for symbol in self.eq_symbol_set.sigma:
                 des_nfa_states = set()
-                for src_nfa_state in old_dfa_state.items[self.item_key]:
-                    des_nfa_states.update(src_nfa_state.next(symbol))
-
+                for src_nfa_state in src_dfa_state.items[self.item_key]:
+                    des_nfa_states.update(src_nfa_state.reach(symbol))
                 if des_nfa_states:
                     link_data = self.eq_symbol_set.index(symbol)
 
                     indexes = self.sorted_state_indexes(des_nfa_states)
                     if indexes in self.created:
-                        old_dfa_state.link(link_data, self.created[indexes])
+                        src_dfa_state.link(link_data, self.created[indexes])
                     else:
                         new_dfa_state = self.new_dfa_state(des_nfa_states)
-                        old_dfa_state.link(link_data, new_dfa_state)
+                        src_dfa_state.link(link_data, new_dfa_state)
 
                         self.created[indexes] = new_dfa_state
                         self.pending.append(new_dfa_state)
