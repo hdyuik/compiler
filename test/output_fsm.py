@@ -1,9 +1,9 @@
-from random import sample
 from collections import defaultdict
 from graphviz import Digraph, Graph
 
 def output_fsm(fsm, filename, symbol_mapper=None):
-    fsm_graph = Digraph()
+    fsm_graph = Digraph(graph_attr={"rankdir": "LR"})
+
     for state in fsm.states:
         name = str(state.index)
         label = str(state.items)
@@ -29,11 +29,14 @@ def output_fsm(fsm, filename, symbol_mapper=None):
     fsm_graph.render(filename, cleanup=True)
 
     if symbol_mapper:
-        mapper_graph = Graph(node_attr={"shape": "record"})
+        mapper_graph = Graph(node_attr={"shape": "record"}, graph_attr={"rankdir": "LR"})
 
         for index, symbols in symbol_mapper.items():
+            text = ""
             if len(symbols) > 10:
-                text = ','.join(sample(symbols, 10))
+                for symbol in symbols:
+                    if str(symbol).isprintable() and len(text) < 10:
+                        text += str(symbol)
             else:
                 text = ','.join(symbols)
 
@@ -44,6 +47,7 @@ def output_fsm(fsm, filename, symbol_mapper=None):
             text = text.replace("}", "\}")
             text = text.replace("\\", "\\\\")
 
-            mapper_graph.node(str(index), "{0}|{1}".format(text, str(index)))
+
+            mapper_graph.node(str(index), "{" +"{0}|{1}".format(text, str(index)) + "}")
 
         mapper_graph.render(filename+"_mapper", cleanup=True)
