@@ -36,6 +36,8 @@ class NFAState:
         self._connection = defaultdict(set)                       # type: Dict[Any, Set[NFAState]]
 
     def link(self, symbol: Any, state: "NFAState"):
+        if symbol is epsilon and state is self:
+            return
         if symbol not in self._connection or state not in self._connection[symbol]:
             edge = Edge(src_state=self, symbol=symbol, dest_state=state)
             self.edges.append(edge)
