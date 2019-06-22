@@ -3,7 +3,7 @@ from collections import deque
 
 class ConvertItem(set):
     def __str__(self):
-        return "STATE: {0}".format(" ".join(str(state.index) for state in self))
+        return "NFAStates: {0}".format(" ".join(str(state.index) for state in self))
 
 class Converter:
     def __init__(self):

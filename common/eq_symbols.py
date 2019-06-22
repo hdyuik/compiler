@@ -29,7 +29,7 @@ class EqualSymbols:
         for symbol, uvs in m.items():
             reversed_m[uvs].add(symbol)
 
-        reversed_translation = defaultdict(set)
+        reversed_translation = defaultdict(set)                                         # type: Dict[int, Set[Any]]
         symbol_translation = {}                                                         # type: Dict[Any, int]
         sigma = set()
         i = 1
@@ -47,4 +47,7 @@ class EqualSymbols:
 
     def index(self, symbol):
         return self.mapper[symbol]
+
+    def symbols(self, index):
+        return self.reversed_mapper[index]
 

@@ -9,6 +9,6 @@ from .fsm import (
     DFAItems,
 )
 
-from .symbol import NonTerminal, Terminal, epsilon, EOF
+from .symbol import Symbol, NonTerminal, Terminal, epsilon, EOF
 
 from .fsm_converter import Converter
