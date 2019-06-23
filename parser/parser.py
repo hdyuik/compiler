@@ -8,6 +8,7 @@ from parser.analyzer import LALRAnalyzer
 
 class Parser:
     def __init__(self, grammar, key_func=None):
+        grammar.check()
         self.grammar = grammar
         if key_func:
             self.key_func = lambda thing: thing if thing is EOF else key_func(thing)
