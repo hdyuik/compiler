@@ -10,6 +10,7 @@
   * parser部分可以参考test/parser_test.py中的json数字的测试用例
 
 ## 部分注意事项
+  * 要运行测试, 必须安装graphviz用于输出状态机图以及语法树
   * lexer
     * lexer的正则语法在recognizer完工之后给出
     * lexer正则的支持力度比较小, 仅支持部分正则, 对于超过type 3部分没有支持
