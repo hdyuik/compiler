@@ -1,6 +1,7 @@
 # a lexer and parser generator
 
 ## TODO
-  * lexer 与 parser 的dfa 生成table, lexer与parser的recognizer.
-  * dfa 最小化
+  * 写完lexer的recognizer
+  * 补测试
+  * 默认dfa 最小化实现
   * re_parser fsm连接
