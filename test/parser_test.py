@@ -1,33 +1,83 @@
-from test.output_fsm import output_fsm
-from common import Converter, EqualSymbols, DFA
+from test.visualize import output_fsm, output_ast
 
-from parser.grammar import Terminal, NonTerminal, Grammar, epsilon
-from parser.lalr_nfa import nfa_generator
-from parser.channelling import Channelling
-
-t1 = Terminal("t1")
-t2 = Terminal("t2")
-t3 = Terminal("t3")
-NT1 = NonTerminal("NT1")
-NT2 = NonTerminal("NT2")
-grammar = Grammar("test")
-grammar.add_rule(NT1, [NT1, NT2, t3])
-grammar.add_rule(NT1, [t2, ])
-grammar.add_rule(NT2, [t1, ])
-
-grammar.set_start_symbol(NT1)
+from common import NonTerminal, Terminal, epsilon
+from parser import Parser, Grammar
 
 
-nfa = nfa_generator(grammar)
+def test_json_number():
+    minus = Terminal("-")
+    plus = Terminal("+")
+    one_nine = Terminal("1-9")
+    zero = Terminal("0")
+    dot = Terminal(".")
+    e = Terminal("e")
+    upper_e = Terminal("E")
 
-channeling = Channelling()
-channeling.channelling(nfa, grammar)
+    SIGN = NonTerminal("SIGN")
+
+    INT = NonTerminal("INT")
+    DIGITS = NonTerminal("DIGITS")
+    DIGIT = NonTerminal("DIGIT")
+
+    FRAC = NonTerminal("FRAC")
+
+    SCI = NonTerminal("SCI")
+    SCI_E = NonTerminal("E/e")
+    SCI_SIGN = NonTerminal("SCI_SIGN")
+
+    NUMBER = NonTerminal("NUMBER")
+
+    g = Grammar("number")
+
+    g.add_rule(SIGN, [epsilon, ])
+    g.add_rule(SIGN, [minus, ])
+
+    g.add_rule(INT, [zero, ])
+    g.add_rule(INT, [one_nine, DIGITS, ])
+    g.add_rule(DIGITS, [DIGIT, DIGITS, ])
+    g.add_rule(DIGITS, [epsilon, ])
+    g.add_rule(DIGIT, [zero, ])
+    g.add_rule(DIGIT, [one_nine, ])
+
+    g.add_rule(FRAC, [epsilon, ])
+    g.add_rule(FRAC, [dot, DIGIT, DIGITS, ])
+
+    g.add_rule(SCI, [epsilon, ])
+    g.add_rule(SCI, [SCI_E, SCI_SIGN, DIGIT, DIGITS])
+    g.add_rule(SCI_E, [e, ])
+    g.add_rule(SCI_E, [upper_e, ])
+    g.add_rule(SCI_SIGN, [plus, ])
+    g.add_rule(SCI_SIGN, [minus, ])
+    g.add_rule(SCI_SIGN, [epsilon, ])
+
+    g.add_rule(NUMBER, [SIGN, INT, FRAC, SCI])
+
+    g.set_start_symbol(NUMBER)
+
+    def key_func(char):
+        if char == '-':
+            return minus
+        elif char in "123456789":
+            return one_nine
+        elif char == '0':
+            return zero
+        elif char == '.':
+            return dot
+        elif char == 'e':
+            return e
+        elif char == 'E':
+            return upper_e
+        elif char == '+':
+            return plus
+    parser = Parser(g, key_func)
+    output_fsm(parser.dfa, "LALR_JSON_NUMBER_DFA")
+
+    ast = parser.parse("-145.698e+9")
+    output_ast(ast, "LALR_JSON_NUMBER_AST")
 
 
-output_fsm(nfa, "LALRNFA")
+def test():
+    test_json_number()
+    pass
 
-nfa_eq_symbols = EqualSymbols(nfa)
-# converter = Converter()
-# dfa = converter.convert(nfa, nfa_eq_symbols, DFA, "nfa_states")
-
-# output_fsm(dfa, "LALRDFA")
+test()

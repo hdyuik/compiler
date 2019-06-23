@@ -1,17 +1,23 @@
-from collections import defaultdict
+from collections import defaultdict, deque
 from graphviz import Digraph, Graph
 
-def output_fsm(fsm, filename, symbol_mapper=None):
+from parser.ast import Leaf
+
+def output_fsm(fsm, filename, eq_symbols=None):
     fsm_graph = Digraph(graph_attr={"rankdir": "LR"})
 
     for state in fsm.states:
         name = str(state.index)
-        label = str(state.items)
+
+        label = str(state.index) + '\n' + str(state.items)
+        if hasattr(state.items, "nfa_states"):
+            for nfa_state in state.items.nfa_states:
+                label += ('\n' + str(nfa_state.items))
 
         if state is fsm.start_state:
             fsm_graph.node(name, label, shape="box")
         elif state in fsm.accepting_states:
-            fsm_graph.node(name, label, shape="doublecircle")
+            fsm_graph.node(name, label, _attributes={"peripheries": "2"})
         else:
             fsm_graph.node(name, label)
 
@@ -28,7 +34,8 @@ def output_fsm(fsm, filename, symbol_mapper=None):
 
     fsm_graph.render(filename, cleanup=True)
 
-    if symbol_mapper:
+    if eq_symbols:
+        symbol_mapper = eq_symbols.reversed_mapper
         mapper_graph = Graph(node_attr={"shape": "record"}, graph_attr={"rankdir": "LR"})
 
         for index, symbols in symbol_mapper.items():
@@ -38,7 +45,7 @@ def output_fsm(fsm, filename, symbol_mapper=None):
                     if str(symbol).isprintable() and len(text) < 10:
                         text += str(symbol)
             else:
-                text = ','.join(symbols)
+                text = ','.join([str(symbol) for symbol in symbols])
 
             text = text.replace("|", "\|")
             text = text.replace(">", "\>")
@@ -51,3 +58,25 @@ def output_fsm(fsm, filename, symbol_mapper=None):
             mapper_graph.node(str(index), "{" +"{0}|{1}".format(text, str(index)) + "}")
 
         mapper_graph.render(filename+"_mapper", cleanup=True)
+
+
+def output_ast(ast, filename):
+    graph = Digraph()
+
+    index = 1
+    graph.node(str(index), label=str(ast.root_symbol) + '\n' + str(ast.rule))
+    pending = deque()
+    pending.append((ast, index))
+    while pending:
+        cur_ast, name = pending.pop()
+        for child in cur_ast.children:
+            index += 1
+            if isinstance(child, Leaf):
+                graph.node(str(index), label=str(child.actual_input))
+            else:
+                graph.node(str(index), label=str(child.root_symbol) + '\n' + str(child.rule))
+            graph.edge(str(name), str(index))
+            pending.append((child, index))
+
+    graph.render(filename, cleanup=True)
+
