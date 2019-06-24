@@ -1,6 +1,4 @@
-from lexer.token import TokenType
-
-from lexer.lexer import Lexer
+from lexer import TokenType, Lexer
 
 
 def test_json():
