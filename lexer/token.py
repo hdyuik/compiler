@@ -1,8 +1,10 @@
 class Token:
-    def __init__(self, symbols, token_type):
-        self.symbols = symbols
+    def __init__(self, sentence, token_type):
+        self.sentence = sentence
         self.token_type = token_type
 
+    def __str__(self):
+        return "type: {0}, sentence: {1}".format(self.token_type.name, self.sentence)
 
 class TokenType:
     count = 0

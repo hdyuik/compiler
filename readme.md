@@ -6,7 +6,7 @@
   * parser使用LALR
   
 ## 使用
-  * lexer部分的recognizer仍未完工
+  * lexer部分参考test/lexer_test.py
   * parser部分可以参考test/parser_test.py中的json数字的测试用例
 
 ## 部分注意事项
@@ -20,7 +20,6 @@
     * 基于文法生成的LALRNFA, 并没有station部分, 因为每一个station只有ε进出, 这部分在构造时被省略
 
 ## TODO
-  * 写完lexer的recognizer
   * 补测试
   * 默认dfa的最小化实现
   * re_parser fsm连接

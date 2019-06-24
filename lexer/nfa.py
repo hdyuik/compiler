@@ -1,8 +1,13 @@
-from common.fsm import NFA, NFAState
+from common.fsm import NFA, NFAState, NFAItems
 from common.symbol import epsilon
 
 
+class LexerNFAItems(NFAItems):
+    def __init__(self):
+        self.token = None
+
 class LexerNFAState(NFAState):
+    ItemStorageClass = LexerNFAItems
     count = 0
 
 
