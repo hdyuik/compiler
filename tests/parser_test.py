@@ -1,4 +1,4 @@
-from compiler_fe.tests.visualize import output_fsm, output_ast
+from tests.visualize import output_fsm, output_ast
 
 from compiler_fe import Parser, Grammar, NonTerminal, Terminal, epsilon
 
