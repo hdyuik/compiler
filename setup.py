@@ -12,9 +12,9 @@ from shutil import rmtree
 from setuptools import find_packages, setup, Command
 
 # Package meta-data.
-NAME = 'compiler_fe'
+NAME = 'pyacc'
 DESCRIPTION = 'a compiler front-end(lexer & parser) generator'
-URL = 'https://github.com/hdyuik/compiler'
+URL = 'https://github.com/hdyuik/pyacc'
 EMAIL = 'me@example.com'
 AUTHOR = 'hdyuik'
 REQUIRES_PYTHON = '>=3.6.0'

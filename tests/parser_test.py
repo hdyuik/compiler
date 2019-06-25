@@ -1,6 +1,6 @@
 from tests.visualize import output_fsm, output_ast
 
-from compiler_fe import Parser, Grammar, NonTerminal, Terminal, epsilon
+from pyacc import Parser, Grammar, NonTerminal, Terminal, epsilon
 
 
 def test_json_number():

@@ -1,7 +1,7 @@
 from typing import Dict, Set
 from collections import defaultdict
 
-from compiler_fe.common import epsilon
+from pyacc.common import epsilon
 from .grammar import Grammar
 from .lalr_nfa import LALRNFA, LALRNFAState
 from .items import LookAheadItem

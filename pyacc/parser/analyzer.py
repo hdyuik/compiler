@@ -1,7 +1,7 @@
 import warnings
 from collections import defaultdict
 
-from compiler_fe.common import epsilon
+from pyacc.common import epsilon
 from .exceptions import AnalyzeError
 from .ast import AST, Leaf
 from .lalr_dfa import LALRDFA
