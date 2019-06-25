@@ -1,4 +1,4 @@
-from fegen.common import EqualSymbols, epsilon
+from pyacc.common import EqualSymbols, epsilon
 from .lalr_nfa import LALRNFA
 
 

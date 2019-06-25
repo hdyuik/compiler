@@ -1,6 +1,6 @@
 from functools import reduce
 
-from fegen.common import Converter, EqualSymbols, EOF
+from pyacc.common import Converter, EqualSymbols, EOF
 from .re_parser import REParser
 from .dfa import LexerDFA
 from .nfa import LexerNFA

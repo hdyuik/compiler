@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from fegen.common import EOF
+from pyacc.common import EOF
 from .exceptions import RESyntaxError
 from .nfa import LexerNFA
 

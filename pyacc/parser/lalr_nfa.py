@@ -1,4 +1,4 @@
-from fegen.common import NFA, NFAState, NFAItems
+from pyacc.common import NFA, NFAState, NFAItems
 
 
 class LALRNFAStateItems(NFAItems):

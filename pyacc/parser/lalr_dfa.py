@@ -1,4 +1,4 @@
-from fegen.common import DFAState, DFA
+from pyacc.common import DFAState, DFA
 
 
 class LALRDFAState(DFAState):

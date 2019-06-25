@@ -1,4 +1,4 @@
-from fegen.common import NFA, NFAState, NFAItems, epsilon
+from pyacc.common import NFA, NFAState, NFAItems, epsilon
 
 
 class LexerNFAItems(NFAItems):

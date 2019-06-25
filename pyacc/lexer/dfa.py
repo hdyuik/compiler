@@ -1,4 +1,4 @@
-from fegen.common import DFA, DFAState
+from pyacc.common import DFA, DFAState
 
 
 class LexerDFAState(DFAState):

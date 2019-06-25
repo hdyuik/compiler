@@ -1,6 +1,6 @@
 import string
 
-from fegen import TokenType, Lexer
+from pyacc import TokenType, Lexer
 
 
 def test_json():

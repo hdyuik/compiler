@@ -1,4 +1,4 @@
-from fegen.common import Converter, EOF
+from pyacc.common import Converter, EOF
 
 from .lalr_dfa import LALRDFA
 from .eq_symbols import LALRNFAEqualSymbols
