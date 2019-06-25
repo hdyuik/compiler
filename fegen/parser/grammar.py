@@ -1,7 +1,7 @@
 from typing import List, Set, Iterator, Iterable, Dict, Tuple
 import collections
 
-from compiler_fe.common import Terminal, NonTerminal, Symbol, EOF, epsilon
+from fegen.common import Terminal, NonTerminal, Symbol, EOF, epsilon
 from .exceptions import GrammarError
 from .lalr_nfa import LALRNFA, LALRNFAState
 from .items import RuleItem

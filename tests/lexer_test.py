@@ -1,6 +1,6 @@
 import string
 
-from compiler_fe import TokenType, Lexer
+from fegen import TokenType, Lexer
 
 
 def test_json():

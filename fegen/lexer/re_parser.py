@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from compiler_fe.common import EOF
+from fegen.common import EOF
 from .exceptions import RESyntaxError
 from .nfa import LexerNFA
 

@@ -1,4 +1,4 @@
-from compiler_fe.common import NFA, NFAState, NFAItems, epsilon
+from fegen.common import NFA, NFAState, NFAItems, epsilon
 
 
 class LexerNFAItems(NFAItems):

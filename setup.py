@@ -12,7 +12,7 @@ from shutil import rmtree
 from setuptools import find_packages, setup, Command
 
 # Package meta-data.
-NAME = 'compiler_fe'
+NAME = 'fegen'
 DESCRIPTION = 'a compiler front-end(lexer & parser) generator'
 URL = 'https://github.com/hdyuik/compiler'
 EMAIL = 'me@example.com'

@@ -1,4 +1,4 @@
-from compiler_fe.common import EqualSymbols, epsilon
+from fegen.common import EqualSymbols, epsilon
 from .lalr_nfa import LALRNFA
 
 

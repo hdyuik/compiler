@@ -1,4 +1,4 @@
-from compiler_fe.common import Converter, EOF
+from fegen.common import Converter, EOF
 
 from .lalr_dfa import LALRDFA
 from .eq_symbols import LALRNFAEqualSymbols

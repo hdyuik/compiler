@@ -1,4 +1,4 @@
-from compiler_fe.common import DFAState, DFA
+from fegen.common import DFAState, DFA
 
 
 class LALRDFAState(DFAState):
