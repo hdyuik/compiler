@@ -1,6 +1,4 @@
-from collections import defaultdict
-
-from common.fsm import DFAState, DFA
+from compiler_fe.common import DFAState, DFA
 
 
 class LALRDFAState(DFAState):

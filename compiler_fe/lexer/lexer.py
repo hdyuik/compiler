@@ -1,10 +1,10 @@
 from functools import reduce
 
-from common import Converter, EqualSymbols, EOF
-from lexer.re_parser import REParser
-from lexer.dfa import LexerDFA
-from lexer.nfa import LexerNFA
-from lexer.recognizer import Recognizer
+from compiler_fe.common import Converter, EqualSymbols, EOF
+from .re_parser import REParser
+from .dfa import LexerDFA
+from .nfa import LexerNFA
+from .recognizer import Recognizer
 
 
 class Lexer:

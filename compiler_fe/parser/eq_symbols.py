@@ -1,5 +1,5 @@
-from common import EqualSymbols, epsilon
-from parser.lalr_nfa import LALRNFA
+from compiler_fe.common import EqualSymbols, epsilon
+from .lalr_nfa import LALRNFA
 
 
 class LALRNFAEqualSymbols(EqualSymbols):

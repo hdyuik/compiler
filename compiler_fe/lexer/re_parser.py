@@ -1,8 +1,8 @@
 from abc import abstractmethod
 
-from common.symbol import EOF
-from lexer.exceptions import RESyntaxError
-from lexer.nfa import LexerNFA
+from compiler_fe.common import EOF
+from .exceptions import RESyntaxError
+from .nfa import LexerNFA
 
 
 class StringBuilder:

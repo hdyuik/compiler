@@ -1,5 +1,4 @@
-from common.fsm import NFA, NFAState, NFAItems
-from common.symbol import epsilon
+from compiler_fe.common import NFA, NFAState, NFAItems, epsilon
 
 
 class LexerNFAItems(NFAItems):

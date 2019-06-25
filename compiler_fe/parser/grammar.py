@@ -1,10 +1,10 @@
 from typing import List, Set, Iterator, Iterable, Dict, Tuple
 import collections
 
-from common import Terminal, NonTerminal, Symbol, EOF, epsilon
-from parser.exceptions import GrammarError
-from parser.lalr_nfa import LALRNFA, LALRNFAState
-from parser.items import RuleItem
+from compiler_fe.common import Terminal, NonTerminal, Symbol, EOF, epsilon
+from .exceptions import GrammarError
+from .lalr_nfa import LALRNFA, LALRNFAState
+from .items import RuleItem
 
 
 RightHand = Tuple["Symbol"]

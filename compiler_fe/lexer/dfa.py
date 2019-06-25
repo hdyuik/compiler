@@ -1,4 +1,4 @@
-from common.fsm import DFA, DFAState
+from compiler_fe.common import DFA, DFAState
 
 
 class LexerDFAState(DFAState):

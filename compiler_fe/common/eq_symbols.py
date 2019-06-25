@@ -2,8 +2,8 @@ from typing import Dict, Any, Tuple, Set
 from random import sample
 from collections import defaultdict
 
-from common.fsm import NFA
-from common.symbol import epsilon
+from .fsm import NFA
+from .symbol import epsilon
 
 
 class EqualSymbols:

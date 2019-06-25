@@ -1,9 +1,9 @@
-from common import Converter, EOF
+from compiler_fe.common import Converter, EOF
 
-from parser.lalr_dfa import LALRDFA
-from parser.eq_symbols import LALRNFAEqualSymbols
-from parser.channelling import Channelling
-from parser.analyzer import LALRAnalyzer
+from .lalr_dfa import LALRDFA
+from .eq_symbols import LALRNFAEqualSymbols
+from .channelling import Channelling
+from .analyzer import LALRAnalyzer
 
 
 class Parser:

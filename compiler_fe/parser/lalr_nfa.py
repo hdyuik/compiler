@@ -1,5 +1,4 @@
-from common import NFA, NFAState, NFAItems
-from parser.items import RuleItem
+from compiler_fe.common import NFA, NFAState, NFAItems
 
 
 class LALRNFAStateItems(NFAItems):

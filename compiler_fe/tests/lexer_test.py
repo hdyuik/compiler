@@ -1,4 +1,4 @@
-from lexer import TokenType, Lexer
+from compiler_fe import TokenType, Lexer
 
 
 def test_json():

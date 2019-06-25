@@ -1,9 +1,10 @@
 from typing import Dict, Set
 from collections import defaultdict
 
-from parser.grammar import epsilon, Grammar
-from parser.lalr_nfa import LALRNFA, LALRNFAState
-from parser.items import LookAheadItem
+from compiler_fe.common import epsilon
+from .grammar import Grammar
+from .lalr_nfa import LALRNFA, LALRNFAState
+from .items import LookAheadItem
 
 
 class FirstSet:

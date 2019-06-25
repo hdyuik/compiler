@@ -1,8 +1,7 @@
 from collections import defaultdict
 
-from common import EOF
-from lexer.token import Token
-from lexer.exceptions import RecognizeError
+from .token import Token
+from .exceptions import RecognizeError
 
 
 class ShiftCell:

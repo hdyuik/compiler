@@ -1,10 +1,10 @@
 import warnings
 from collections import defaultdict
 
-from common import epsilon
-from parser.exceptions import AnalyzeError
-from parser.ast import AST, Leaf
-from parser.lalr_dfa import LALRDFA
+from compiler_fe.common import epsilon
+from .exceptions import AnalyzeError
+from .ast import AST, Leaf
+from .lalr_dfa import LALRDFA
 
 
 class ReduceCell:

@@ -2,7 +2,7 @@ from typing import Dict, Set, Any, List
 from collections import defaultdict
 from functools import reduce
 
-from common.symbol import epsilon
+from .symbol import epsilon
 
 
 class NFAItems:

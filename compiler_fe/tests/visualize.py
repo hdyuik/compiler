@@ -2,7 +2,7 @@ import os
 from collections import defaultdict, deque
 from graphviz import Digraph, Graph
 
-from parser.ast import Leaf
+from compiler_fe.parser.ast import Leaf
 
 def output_fsm(fsm, filename, eq_symbols=None):
     fsm_graph = Digraph(graph_attr={"rankdir": "LR"})
