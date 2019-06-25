@@ -1,4 +1,4 @@
-from test.visualize import output_fsm, output_ast
+from tests.visualize import output_fsm, output_ast
 
 from common import NonTerminal, Terminal, epsilon
 from parser import Parser, Grammar
