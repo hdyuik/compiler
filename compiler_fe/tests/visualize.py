@@ -1,10 +1,10 @@
 import os
 from collections import defaultdict, deque
-from graphviz import Digraph, Graph
+from graphviz import Digraph
 
 from compiler_fe.parser.ast import Leaf
 
-def output_fsm(fsm, filename, eq_symbols=None):
+def output_fsm(fsm, filename):
     fsm_graph = Digraph(graph_attr={"rankdir": "LR"})
 
     for state in fsm.states:
@@ -34,31 +34,6 @@ def output_fsm(fsm, filename, eq_symbols=None):
         fsm_graph.edge(conn[0], conn[1], ",".join(symbol))
 
     fsm_graph.render(filename, cleanup=True, directory=os.path.dirname(__file__))
-
-    if eq_symbols:
-        symbol_mapper = eq_symbols.reversed_mapper
-        mapper_graph = Graph(node_attr={"shape": "record"}, graph_attr={"rankdir": "LR"})
-
-        for index, symbols in symbol_mapper.items():
-            text = ""
-            if len(symbols) > 10:
-                for symbol in symbols:
-                    if str(symbol).isprintable() and len(text) < 10:
-                        text += str(symbol)
-            else:
-                text = ','.join([str(symbol) for symbol in symbols])
-
-            text = text.replace("|", "\|")
-            text = text.replace(">", "\>")
-            text = text.replace("<", "\<")
-            text = text.replace("{", "\{")
-            text = text.replace("}", "\}")
-            text = text.replace("\\", "\\\\")
-
-
-            mapper_graph.node(str(index), "{" +"{0}|{1}".format(text, str(index)) + "}")
-
-        mapper_graph.render(filename+"_mapper", cleanup=True)
 
 
 def output_ast(ast, filename):

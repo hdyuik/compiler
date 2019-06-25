@@ -25,10 +25,7 @@ class BaseParser:
         self.re_length = None
 
     def look_ahead(self):
-        if self.index < self.re_length:
-            return self.regex[self.index]
-        else:
-            return EOF
+        return self.regex[self.index]
 
     def consume(self):
         c = self.look_ahead()
@@ -47,7 +44,7 @@ class BaseParser:
             raise RESyntaxError(self.index, "can not parsing EOF")
 
     def parse(self, regex: str) -> "LexerNFA":
-        self.regex = list(regex)
+        self.regex = list(regex) + [EOF, ]
         self.re_length = len(regex)
         self.index = 0
         nfa = self._parse()
@@ -71,10 +68,10 @@ class REParser(BaseParser):
         not_escape       ->         不包含META SYMBOLS
         dot              ->         .
     """
-    SIGMA = set([chr(code) for code in range(256)])
+    SIGMA = set([chr(code) for code in range(65536)])
     STRING_BUILDER = StringBuilder(SIGMA)
     ESCAPES = set("\\")
-    META_SYMBOLS = ESCAPES.union(set("[(){*+?|."))
+    META_SYMBOLS = ESCAPES.union(set("[()*+?|."))
     CONTROL_CHARACTERS = set('nt')
     CONTROL_CHARACTERS_MAPPER = {
         'n': '\n',
@@ -83,6 +80,7 @@ class REParser(BaseParser):
     ESCAPED_SYMBOLS = META_SYMBOLS.union(CONTROL_CHARACTERS)
     FIRST_OF_LETTER = STRING_BUILDER.not_include(META_SYMBOLS).union({"\\", "."})
     FIRST_OF_ATOMIC = FIRST_OF_LETTER.union({"[", "("})
+    LETTER_IN_BRACKET = STRING_BUILDER.not_include({"\\", "]"})
     DOT = STRING_BUILDER.not_include({"\n", "\t"})
 
     def parse_re(self):
@@ -154,7 +152,7 @@ class REParser(BaseParser):
         else:
             raise RESyntaxError(self.index, "can not parsing start of bracket")
 
-        nfa = self.parse_alter()
+        nfa = self.parse_one_of()
 
         if self.look_ahead() == ']':
             self.consume()
@@ -162,7 +160,7 @@ class REParser(BaseParser):
             raise RESyntaxError(self.index, "can not parsing end of bracket")
         return nfa
 
-    def parse_alter(self):
+    def parse_one_of(self):
         reverse = False
         if self.look_ahead() == '^':
             self.consume()
@@ -215,7 +213,7 @@ class REParser(BaseParser):
                 return self.consume()
             else:
                 raise RESyntaxError(self.index, "error escape letter in bracket")
-        elif self.look_ahead() != ']':
+        elif self.look_ahead() in self.LETTER_IN_BRACKET:
             return self.consume()
         else:
             raise RESyntaxError(self.index, "error letter in bracket")

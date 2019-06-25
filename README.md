@@ -20,16 +20,6 @@
     * 基于文法生成的LALRNFA, 并没有station部分, 因为每一个station只有ε进出, 这部分在构造时被省略
 
 ## TODO
-  * 补测试
   * 默认dfa的最小化实现
-  * re_parser fsm连接
+  * 修改edge的实现
   * 加入debug选项, 输出运行过程数据
-    * lexer
-      * 递归下降分析正则的过程
-      * 生成的nfa
-      * nfa转换成的dfa
-      * 识别过程
-    * parser
-      * 文法转换成的lalr_nfa
-      * nfa 转换成的 dfa
-      * 识别过程中, parsing_stack以及input_stack, 在每一次shift/reduce时的变化

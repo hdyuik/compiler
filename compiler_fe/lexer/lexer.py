@@ -25,9 +25,11 @@ class Lexer:
         nfas = []
         for token_type in self.token_types:
             nfa = self.re_parser.parse(token_type.regex)
+
             for state in nfa.accepting_states:
                 state.items.token = token_type
             nfas.append(nfa)
+
         self.nfa = reduce(lambda nfa1, nfa2: nfa1.union(nfa2), nfas)
         self.eq_symbols = EqualSymbols(self.nfa)
         self.dfa = Converter().convert(
