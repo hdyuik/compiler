@@ -1,3 +1,4 @@
+import os
 from collections import defaultdict, deque
 from graphviz import Digraph, Graph
 
@@ -32,7 +33,7 @@ def output_fsm(fsm, filename, eq_symbols=None):
     for conn, symbol in folded_edges.items():
         fsm_graph.edge(conn[0], conn[1], ",".join(symbol))
 
-    fsm_graph.render(filename, cleanup=True)
+    fsm_graph.render(filename, cleanup=True, directory=os.path.dirname(__file__))
 
     if eq_symbols:
         symbol_mapper = eq_symbols.reversed_mapper
@@ -78,5 +79,5 @@ def output_ast(ast, filename):
             graph.edge(str(name), str(index))
             pending.append((child, index))
 
-    graph.render(filename, cleanup=True)
+    graph.render(filename, cleanup=True, directory=os.path.dirname(__file__))
 

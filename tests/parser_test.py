@@ -1,7 +1,6 @@
 from tests.visualize import output_fsm, output_ast
 
-from common import NonTerminal, Terminal, epsilon
-from parser import Parser, Grammar
+from parser import Parser, Grammar, NonTerminal, Terminal, epsilon
 
 
 def test_json_number():

@@ -1,5 +1,5 @@
 # pdf created by graphviz
-test/*.pdf
+tests/*.pdf
 
 # idea
 .idea/
