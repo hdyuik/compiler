@@ -18,7 +18,7 @@ URL = 'https://github.com/hdyuik/compiler'
 EMAIL = 'me@example.com'
 AUTHOR = 'hdyuik'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '0.1.0'
+VERSION = ''
 
 with open("requirements.txt", mode="r") as f:
     f.readlines()
